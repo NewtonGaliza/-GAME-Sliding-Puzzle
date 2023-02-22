@@ -12,14 +12,13 @@ public class Puzzle : MonoBehaviour
     void Start()
     {
         Init();
+        for(int i = 0; i < 15; i++)
+        {
+            Shuffle();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+   
     void Init()
     {
         int n = 0;
@@ -37,7 +36,11 @@ public class Puzzle : MonoBehaviour
     {
         int dx = getDx(x,y);
         int dy = getDy(x,y);
+        Swap(x, y, dx, dy);
+    }
 
+    void Swap(int x, int y, int dx, int dy)
+    {
         var from = boxes[x,y];
         var target = boxes[x + dx, y + dy];
 
@@ -85,10 +88,59 @@ public class Puzzle : MonoBehaviour
         return 0;
     }
 
+    void Shuffle()
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            for(int j = 0; j < 4; j++)
+            {
+                if(boxes[i,j].IsEmpty())
+                {
+                    Vector2 pos = getValidMove(i,j);
+                    Swap(i, j, (int)pos.x, (int)pos.y);
+                }
+            }
+        }
+    }
 
+    Vector2 getValidMove(int x, int y)
+    {
+        Vector2 pos = new Vector2();
+        int n = Random.Range(0,4);
+        do
+        {
+            if(n == 0)
+            {
+                pos = Vector2.left;
+            }
+            else if(n == 1)
+            {
+                pos = Vector2.right;
+            }
+            else if(n == 2)
+            {
+                pos = Vector2.up;
+            }
+            else
+            {
+                pos = Vector2.down;
+            }
+        } while(!(isValidRange(x + (int)pos.x) && isValidRange(y + (int)pos.y)) || isRepeatMove(pos));
+        lastMove = pos;
+        return pos;
+    }
 
+    bool isValidRange(int n)
+    {
+        return n >= 0 && n <= 3;
+    }
 
+    bool isRepeatMove(Vector2 pos)
+    {
+        return pos*-1==lastMove;
+    }
 
+    private Vector2 lastMove;
 
 
 
